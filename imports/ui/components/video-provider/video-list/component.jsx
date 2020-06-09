@@ -76,8 +76,6 @@ class VideoList extends Component {
         filledArea: 0,
       },
       autoplayBlocked: false,
-      activePage: 1,
-      show: true,
     };
 
     this.ticking = false;
@@ -116,12 +114,10 @@ class VideoList extends Component {
 
   setOptimalGrid() {
     const { users } = this.props;
-    // let numItems = users.length;
-    let numItems = this.LimitUser;
+    let numItems = users.length;
     if (numItems < 1 || !this.canvas || !this.grid) {
       return;
     }
-
     const { focusedId } = this.state;
     const { width: canvasWidth, height: canvasHeight } = this.canvas.getBoundingClientRect();
 
@@ -139,9 +135,9 @@ class VideoList extends Component {
           ASPECT_RATIO, numItems, col,
         );
         // We need a minimun of 2 rows and columns for the focused
-        // const focusedConstraint = hasFocusedItem ? testGrid.rows > 1 && testGrid.columns > 1 : true;
+        const focusedConstraint = hasFocusedItem ? testGrid.rows > 1 && testGrid.columns > 1 : true;
         const betterThanCurrent = testGrid.filledArea > currentGrid.filledArea;
-        return betterThanCurrent ? testGrid : currentGrid;
+        return focusedConstraint && betterThanCurrent ? testGrid : currentGrid;
       }, { filledArea: 0 });
     this.setState({
       optimalGrid,
@@ -207,38 +203,7 @@ class VideoList extends Component {
     this.ticking = true;
   }
 
-  checkMe(LimitPage) {
-    // console.log("---------------------");
-
-    // console.log('checkMe:', LimitPage);
-    // console.log('isMe:', this.isMe);
-    // console.log('show:', this.state.show);
-    // console.log("---------------------");
-
-    if (LimitPage === 0 && this.page === 0 && this.isMe != undefined) {
-      if (this.state.show == true) {
-        return -1
-      } else if (this.state.show == false) {
-        return 1
-      }
-    }
-    else {
-      return 1
-    }
-
-    // amount.map((e, i) => {
-    //   console.log(i);
-
-    //   if (!i) {
-    //     return -1
-    //   } else {
-    //     return 1
-    //   }
-    // })
-  }
-
-  renderVideoList(pageNumber) {
-
+  renderVideoList() {
     const {
       intl,
       users,
@@ -249,64 +214,30 @@ class VideoList extends Component {
       swapLayout,
     } = this.props;
     const { focusedId } = this.state;
-    const pageSize = 6;
 
-    if (pageNumber == undefined) {
-      pageNumber = 1;
-    }
-    let pageIndex = pageNumber; //******************
-    let totalPage = Math.ceil(users.length / pageSize)
-    let offset = (pageIndex - 1) * pageSize;
-    let LimitUsers = [...users];
-    let LimitPage = [...users];
-    if (LimitUsers.length > 1) {
-      LimitUsers = LimitUsers.slice(offset, offset + pageSize);
-    }
-
-    console.log('user', users);
-    console.log('LimitUsers', LimitUsers);
-
-    // this.isMe = LimitUsers[0]['sortName']
-    this.isMe = users[0]['sortName']
-    this.page = offset
-    this.offset = offset + LimitUsers.length
-    this.LimitPage = LimitPage.length
-    this.LimitUser = LimitUsers.length
-
-    // console.log('page', this.page);
-    // console.log('offset', this.offset);
-    // console.log('LimitUser', this.LimitUser);
-    // console.log('LimitPage', this.LimitPage);
-
-    if (this.LimitUser == 0 && this.offset == this.LimitPage) {
-      this.setState({
-        activePage: this.state.activePage - 1
-      });
-    }
-
-    return LimitUsers.map((user, LimitPage) => {
+    return users.map((user) => {
       const isFocused = focusedId === user.userId;
       const isFocusedIntlKey = !isFocused ? 'focus' : 'unfocus';
       let actions = [];
 
-      if (LimitUsers.length > 2) {
+      if (users.length > 2) {
         actions = [{
           label: intl.formatMessage(intlMessages[`${isFocusedIntlKey}Label`]),
           description: intl.formatMessage(intlMessages[`${isFocusedIntlKey}Desc`]),
           onClick: () => this.handleVideoFocus(user.userId),
         }];
       }
+
       return (
         <div
           key={user.userId}
           className={cx({
             [styles.videoListItem]: true,
-            [styles.focused]: focusedId === user.userId && LimitUsers.length > 2,
+            [styles.focused]: focusedId === user.userId && users.length > 2,
           })}
-        // style={{ transform: `scaleX(${this.checkMe(LimitPage)})` }}
         >
           <VideoListItemContainer
-            numOfUsers={LimitUsers.length}
+            numOfUsers={users.length}
             user={user}
             actions={actions}
             onMount={(videoRef) => {
@@ -317,7 +248,6 @@ class VideoList extends Component {
             stopGettingStats={() => stopGettingStats(user.userId)}
             enableVideoStats={enableVideoStats}
             swapLayout={swapLayout}
-            transformVideos={this.checkMe(LimitPage)}
           />
         </div>
       );
@@ -328,7 +258,6 @@ class VideoList extends Component {
     const { users, intl } = this.props;
     const { optimalGrid, autoplayBlocked } = this.state;
 
-
     const canvasClassName = cx({
       [styles.videoCanvas]: true,
     });
@@ -337,105 +266,39 @@ class VideoList extends Component {
       [styles.videoList]: true,
     });
 
-    // console.log('setState Videos', this.setState);
-
-    let prev;
-    let next;
-
-    if (this.state.activePage >= 2) {
-      prev = <button class="h_button_left" style={{ height: `${optimalGrid.height - 50}px`, margin: "0 12px" }} onClick={() => {
-        this.setState({
-          activePage: this.state.activePage - 1
-        });
-        // this.renderVideoList(this.state.activePage);
-      }
-      }>
-        <i class="icon-bbb-left_arrow" style={{ color: "black" }} aria-hidden="true"></i>
-
-      </button>
-    } else if (this.isMe != undefined) {
-      if (this.state.show == true) {
-        prev = <button class="h_button_right" style={{ height: `30px`, width: `30px`, position: "absolute", top: "0px", zIndex: "1" }} onClick={() => {
-          this.setState({
-            show: this.state.show = false
-          });
-        }
-        }>
-          <i class="icon-bbb-refresh" style={{ color: "black" }} aria-hidden="true"></i>
-        </button>
-      } else if (this.state.show == false) {
-        prev = <button class="h_button_right" style={{ height: `30px`, width: `30px`, position: "absolute", top: "0px", zIndex: "1" }} onClick={() => {
-          this.setState({
-            show: this.state.show = true
-          });
-        }
-        }>
-          <i class="icon-bbb-refresh" style={{ color: "black" }} aria-hidden="true"></i>
-        </button>
-      }
-    }
-
-    if (this.state.activePage <= 16 && this.offset < this.LimitPage) {
-      next = <button class="h_button_right" style={{ height: `${optimalGrid.height - 50}px`, margin: "0 12px" }} onClick={() => {
-        this.setState({
-          activePage: this.state.activePage + 1
-        });
-        // this.renderVideoList(this.state.activePage);
-      }
-      }>
-        <i class="icon-bbb-right_arrow" style={{ color: "black" }} aria-hidden="true"></i>
-
-      </button>
-    }
-
     return (
-      <div>
-        <div
-          ref={(ref) => {
-            this.canvas = ref;
-          }}
-          className={canvasClassName}
-        >
-          <div >
-            {prev}
+      <div
+        ref={(ref) => {
+          this.canvas = ref;
+        }}
+        className={canvasClassName}
+      >
+        {!users.length ? null : (
+          <div
+            ref={(ref) => {
+              this.grid = ref;
+            }}
+            className={videoListClassName}
+            style={{
+              width: `${optimalGrid.width}px`,
+              height: `${optimalGrid.height}px`,
+              gridTemplateColumns: `repeat(${optimalGrid.columns}, 1fr)`,
+              gridTemplateRows: `repeat(${optimalGrid.rows}, 1fr)`,
+            }}
+          >
+            {this.renderVideoList()}
           </div>
-          {/* {users.map(user => console.log("user: ", user)
-          )} */}
-          {!users.length ? null : (
-            <div
-              ref={(ref) => {
-                this.grid = ref;
-              }}
-              className={videoListClassName}
-              style={{
-                // width: `${178 * this.LimitUser}px`,
-                width: `${optimalGrid.width}px`,
-                height: `${optimalGrid.height}px`,
-                // transform: `scaleX(-1)`,
-                // gridTemplateColumns: `repeat(${this.LimitUser}, 1fr)`,
-                gridTemplateColumns: `repeat(${optimalGrid.columns}, 1fr)`,
-                gridTemplateRows: `repeat(${optimalGrid.rows}, 1fr)`,
-              }}
-            >
-              {this.renderVideoList(this.state.activePage)}
-              <i class="fa fa-chevron-right" aria-hidden="true"></i>
-            </div>
-          )}
-          {!autoplayBlocked ? null : (
-            <AutoplayOverlay
-              autoplayBlockedDesc={intl.formatMessage(intlMessages.autoplayBlockedDesc)}
-              autoplayAllowLabel={intl.formatMessage(intlMessages.autoplayAllowLabel)}
-              handleAllowAutoplay={this.handleAllowAutoplay}
-            />
-          )}
-          {next}
-        </div>
-
-      </div >
+        )}
+        { !autoplayBlocked ? null : (
+          <AutoplayOverlay
+            autoplayBlockedDesc={intl.formatMessage(intlMessages.autoplayBlockedDesc)}
+            autoplayAllowLabel={intl.formatMessage(intlMessages.autoplayAllowLabel)}
+            handleAllowAutoplay={this.handleAllowAutoplay}
+          />
+        )}
+      </div>
     );
-
   }
-
 }
 
 VideoList.propTypes = propTypes;

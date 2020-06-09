@@ -168,7 +168,6 @@ class BreakoutRoom extends PureComponent {
       valid: true,
       record: false,
       numberOfRoomsIsValid: true,
-      // test:""
     };
 
     this.btnLevelId = _.uniqueId('btn-set-level-');
@@ -367,16 +366,12 @@ class BreakoutRoom extends PureComponent {
     const { durationTime } = this.state;
     const number = ((1 * durationTime) + 1)
     this.setState({ durationTime: number>30?30:number });
-    // console.log("เพิ่มขึ้น",durationTime)
-
   }
 
   decreaseDurationTime() {
-    // const durationTime = this.state.durationTime;
     const { durationTime } = this.state;
     const number = ((1 * durationTime) - 1);
     this.setState({ durationTime: number < 1 ? 1 : number });
-    // console.log("ลดลง",durationTime)
   }
 
   changeDurationTime(event) {
@@ -491,15 +486,12 @@ class BreakoutRoom extends PureComponent {
               <input
                 type="number"
                 className={styles.duration}
-                min="2"
-                // max="30"
+                min="1"
                 value={durationTime}
                 onChange={this.changeDurationTime}
                 onBlur={this.blurDurationTime}
                 aria-label={intl.formatMessage(intlMessages.duration)}
-                disabled = {true}
               />
-              {/* <h1>{this.state.test}</h1> */}
               <HoldButton
                 key="decrease-breakout-time"
                 exec={this.decreaseDurationTime}
@@ -523,8 +515,7 @@ class BreakoutRoom extends PureComponent {
                 key="increase-breakout-time"
                 exec={this.increaseDurationTime}
                 className={styles.btnStyle}
-              > 
-              {/* ปุ่มเพิ่มเวลา */}
+              >
                 <Button
                   label={intl.formatMessage(intlMessages.addRoomTime)}
                   aria-label={

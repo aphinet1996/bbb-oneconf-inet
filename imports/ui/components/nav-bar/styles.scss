@@ -67,10 +67,10 @@
     content: '';
     position: absolute;
     border-radius: 50%;
-    width: 12px;
-    height: 12px;
-    bottom: var(--border-size);
-    right: 3px;
+    width: 15px;
+    height: 15px;
+    bottom: 7px;  //var(--border-size)
+    right: 5px;
     background-color: var(--color-danger);
     border: var(--border-size) solid var(--color-gray-dark);
   }
@@ -78,7 +78,7 @@
 
 .arrowRight,
 .arrowLeft {
-  position: absolute;
+  position: sticky;
   font-size: var(--arrow-size);
   color: var(--color-white);
 }
@@ -93,7 +93,7 @@
 }
 
 .arrowRight {
-  width: var(--md-padding-x);
+  width: var(--lg-padding-x);
   left: var(--arrow-r-left);
   [dir="rtl"] & {
     right: .5rem;
