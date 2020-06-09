@@ -184,7 +184,6 @@ class VideoListItem extends Component {
       numOfUsers,
       webcamDraggableState,
       swapLayout,
-      transformVideos,
     } = this.props;
     const availableActions = this.getAvailableActions();
     const enableVideoMenu = Meteor.settings.public.kurento.enableVideoMenu || false;
@@ -218,7 +217,6 @@ class VideoListItem extends Component {
             ref={(ref) => { this.videoTag = ref; }}
             autoPlay
             playsInline
-            style={{ transform: `scaleX(${transformVideos})` }}
           />
           {videoIsReady && this.renderFullscreenButton()}
         </div>
