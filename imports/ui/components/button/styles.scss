@@ -44,6 +44,22 @@
   --btn-jumbo-padding: var(--jumbo-padding-y) var(--jumbo-padding-x);
 }
 
+
+.more {
+  border: none;
+  overflow: visible;
+  display: inline-block;
+  border-radius: var(--border-size);
+  font-weight: var(--btn-font-weight);
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  user-select: none;
+  border-radius: 8px;
+}
+
 .button {
   border: none;
   overflow: visible;
