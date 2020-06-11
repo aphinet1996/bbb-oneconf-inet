@@ -104,8 +104,8 @@ class ActionsBar extends PureComponent {
           {isLayoutSwapped
             ? (
               <PresentationOptionsContainer
-                // toggleSwapLayout={toggleSwapLayout}
-                // isThereCurrentPresentation={isThereCurrentPresentation}
+                toggleSwapLayout={toggleSwapLayout}
+                isThereCurrentPresentation={isThereCurrentPresentation}
               />
             )
             : null
